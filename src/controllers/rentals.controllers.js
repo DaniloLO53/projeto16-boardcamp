@@ -93,6 +93,9 @@ async function returnRent(request, response, next) {
     const returnDate = dayjs(returnDateRaw).format('YYYY-MM-DD');
     const result = await db.query('SELECT * FROM rentals WHERE "id" = $1', [id]);
     const rent = result.rows[0];
+
+    if (!rent) return response.send(404);
+
     const { rentDate, daysRented, originalPrice, customerId, gameId } = rent;
 
     const delayDays = (returnDateRaw - rentDate) / 60 / 60 / 24 / 1000;
@@ -118,7 +121,6 @@ async function returnRent(request, response, next) {
     }
 
     if (rent.returnDate) return response.send(400);
-    return response.send(404);
 
 
   } catch (error) {
@@ -135,6 +137,8 @@ async function deleteRent(request, response, next) {
     const result = await db.query('SELECT * FROM rentals WHERE "id" = $1', [id]);
     const rent = result.rows[0];
 
+    if (!rent) return response.send(404);
+
     if (rent && rent.returnDate) {
       await db.query('DELETE FROM rentals WHERE "id" = $1', [id]);
 
@@ -142,7 +146,6 @@ async function deleteRent(request, response, next) {
     }
 
     if (!rent.returnDate) return response.sendStatus(400);
-    return response.sendStatus(404);
 
   } catch (error) {
     console.log('Error: ', error);
