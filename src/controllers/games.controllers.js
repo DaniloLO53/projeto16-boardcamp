@@ -26,6 +26,8 @@ async function insertGame(request, response, next) {
     const gameAlreadyExists = await db.query(`SELECT * FROM games WHERE "name" = $1`,
       [name]);
 
+    console.log(gameAlreadyExists)
+
     if (
       !name
       || name === ''
@@ -33,7 +35,7 @@ async function insertGame(request, response, next) {
       || pricePerDay <= 0
     ) return response.sendStatus(400);
 
-    if (gameAlreadyExists) return response.sendStatus(409);
+    if (gameAlreadyExists.rowCount !== 0) return response.sendStatus(409);
 
     await db.query(`INSERT INTO games ("name", "image", "stockTotal", "pricePerDay")
     VALUES ($1, $2, $3, $4)`,
