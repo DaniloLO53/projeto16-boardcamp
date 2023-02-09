@@ -92,8 +92,32 @@ async function returnRent(request, response, next) {
   }
 };
 
+async function deleteRent(request, response, next) {
+  const { id } = request.params;
+
+  try {
+    const result = await db.query('SELECT * FROM rentals WHERE "id" = $1', [id]);
+    const rent = result.rows[0];
+
+    if (rent && rent.returnDate) {
+      await db.query('DELETE FROM rentals WHERE "id" = $1', [id]);
+
+      return response.sendStatus(200);
+    }
+
+    if (!rent.returnDate) return response.sendStatus(400);
+    return response.sendStatus(404);
+
+  } catch (error) {
+    console.log('Error: ', error);
+
+    return response.sendStatus(500);
+  }
+};
+
 export {
   getRentals,
   insertRental,
   returnRent,
+  deleteRent,
 };
