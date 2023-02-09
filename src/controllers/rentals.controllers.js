@@ -4,10 +4,39 @@ import dayjs from 'dayjs';
 async function getRentals(request, response, next) {
   try {
     const results = await db.query('SELECT * FROM rentals;');
-    const rentals = results.rows;
-    console.log(rentals);
+    const resultFromGames = await db.query('SELECT * FROM games;');
+    const resultFromCustomers = await db.query('SELECT * FROM customers;');
 
-    return response.status(200).send(rentals);
+    const rentals = results.rows;
+
+    const customerObject = rentals.map(({ customerId, gameId }) => {
+      const { id: idCostumer, name: nameCostumer } = resultFromCustomers.rows.find(({ id }) => id === customerId);
+      const { id: idGame, name: nameGame } = resultFromGames.rows.find(({ id }) => id === gameId);
+      const final = {
+        customer: {
+          "id": idCostumer,
+          "name": nameCostumer,
+        },
+        game: {
+          "id": idGame,
+          "name": nameGame,
+        }
+      }
+
+      return final;
+    });
+    const modifiedRentals = rentals.map((object) => {
+      const respectiveCustomerObject = customerObject.find(({ customer }) => customer.id === object.customerId);
+
+      const newRental = {
+        ...object,
+        ...respectiveCustomerObject,
+      };
+
+      return newRental;
+    });
+
+    return response.status(200).send(modifiedRentals);
   } catch (error) {
     console.log(error)
 
@@ -26,6 +55,13 @@ async function insertRental(request, response, next) {
     const rentDate = dayjs(Date.now()).format('YYYY-MM-DD');
     const resultFromGames = await db.query('SELECT * FROM games WHERE "id" = $1',
       [gameId]);
+    const resultFromCustomers = await db.query('SELECT * FROM games WHERE "id" = $1',
+      [customerId]);
+
+    if (
+      resultFromGames.rows[0] === 0
+      || resultFromCustomers.rows[0] === 0)
+      return response.sendStatus(400);
 
     const { pricePerDay } = resultFromGames.rows[0];
     const originalPrice = pricePerDay * daysRented;

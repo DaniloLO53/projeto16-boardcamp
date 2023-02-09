@@ -45,7 +45,7 @@ async function getCustomer(request, response, next) {
 
     if (!customer) return response.sendStatus(404);
 
-    return response.sendStatus(customer);
+    return response.status(200).send(customer);
   } catch (error) {
     console.log('Error: ', error);
 
