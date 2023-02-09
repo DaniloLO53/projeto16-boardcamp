@@ -7,11 +7,11 @@ import {
 } from '../../controllers/customers.controllers.js';
 import customersValidator from '../../middlewares/customersValidator.middleware.js';
 
-const customersRouter = express.Router();
+const customersRoute = express.Router();
 
-customersRouter.post('/customers', customersValidator, insertCustomer);
-customersRouter.get('/customers', getCustomers);
-customersRouter.get('/customers/:id', getCustomer);
-customersRouter.put('/customers/:id', customersValidator, updateCustomer);
+customersRoute.post('/customers', customersValidator, insertCustomer);
+customersRoute.get('/customers', getCustomers);
+customersRoute.get('/customers/:id', getCustomer);
+customersRoute.put('/customers/:id', customersValidator, updateCustomer);
 
-export default customersRouter;
+export default customersRoute;
