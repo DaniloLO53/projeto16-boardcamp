@@ -12,8 +12,14 @@ async function updateCustomer(request, response, next) {
   try {
     const customerAlreadyExists = await db.query(`SELECT * FROM customers WHERE "id" = $1`,
       [id]);
+    const customerWithCpf = await db.query(`SELECT * FROM customers
+      WHERE "cpf" = $1 AND "id" != $2`,
+      [cpf, id]);
 
-    if (customerAlreadyExists.rowCount === 0) return response.sendStatus(409);
+    if (
+      customerAlreadyExists.rowCount === 0
+      || customerWithCpf.rowCount !== 0
+    ) return response.sendStatus(409);
 
     await db.query(`UPDATE customers SET 
       "name" = $1,
@@ -23,7 +29,7 @@ async function updateCustomer(request, response, next) {
       WHERE "id" = $5`,
       [name, phone, cpf, birthday, id]);
 
-    return response.sendStatus(201);
+    return response.sendStatus(200);
 
   } catch (error) {
     console.log(error)
@@ -39,7 +45,7 @@ async function getCustomer(request, response, next) {
 
     if (!customer) return response.sendStatus(404);
 
-    return response.sendStatus(200);
+    return response.sendStatus(customer);
   } catch (error) {
     console.log('Error: ', error);
 
