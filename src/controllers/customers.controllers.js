@@ -1,5 +1,21 @@
 import { db } from "../database/database.js";
 
+async function getCustomer(request, response, next) {
+  const { id } = request.params;
+  try {
+    const result = await db.query('SELECT * FROM customers WHERE "id" = $1', [id]);
+    const customer = result.rows[0];
+
+    if (!customer) return response.sendStatus(404);
+
+    return response.sendStatus(200);
+  } catch (error) {
+    console.log('Error: ', error);
+
+    return response.sendStatus(500);
+  }
+};
+
 async function getCustomers(request, response, next) {
   try {
     const customers = await db.query('SELECT * FROM customers;');
@@ -42,5 +58,6 @@ async function insertCustomer(request, response, next) {
 
 export {
   getCustomers,
+  getCustomer,
   insertCustomer,
 };
