@@ -2,7 +2,7 @@ import { db } from "../database/database.js";
 import dayjs from 'dayjs';
 
 async function getRentals(request, response, next) {
-  const { gameId, customerId } = request.query;
+  const { gameId, customerId, offset, limit, order, desc } = request.query;
   let query = `SELECT * FROM rentals`;
 
   if (gameId && !customerId) {
@@ -14,6 +14,15 @@ async function getRentals(request, response, next) {
   if (customerId && gameId) {
     query += ` WHERE "customerId" = '${customerId}'
     AND "gameId" = '${gameId}'`;
+  }
+  if (order) {
+    query += ` ORDER BY ${order} ${desc ? 'DESC' : ''}`;
+  }
+  if (offset) {
+    query += ` OFFSET ${offset}`;
+  }
+  if (limit) {
+    query += ` LIMIT ${limit}`;
   }
 
   try {

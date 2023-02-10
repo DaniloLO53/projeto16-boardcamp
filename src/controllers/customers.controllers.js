@@ -54,17 +54,25 @@ async function getCustomer(request, response, next) {
 };
 
 async function getCustomers(request, response, next) {
-  const { cpf } = request.query;
+  const { cpf, offset, limit, order, desc } = request.query;
   let query = `SELECT * FROM customers`;
 
   if (cpf) {
     query += ` WHERE cpf LIKE '${cpf}_%'`;
   }
+  if (order) {
+    query += ` ORDER BY ${order} ${desc ? 'DESC' : ''}`;
+  }
+  if (offset) {
+    query += ` OFFSET ${offset}`;
+  }
+  if (limit) {
+    query += ` LIMIT ${limit}`;
+  }
 
   try {
     const customers = await db.query(query);
     const results = customers.rows;
-    console.log(customers);
 
     return response.status(200).send(results);
   } catch (error) {

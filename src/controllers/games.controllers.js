@@ -1,11 +1,20 @@
 import { db } from "../database/database.js";
 
 async function getGames(request, response, next) {
-  const { name } = request.query;
+  const { name, limit, offset, order, desc } = request.query;
   let query = `SELECT * FROM games`;
 
   if (name) {
     query += ` WHERE LOWER(name) LIKE LOWER('${name}_%')`;
+  }
+  if (order) {
+    query += ` ORDER BY ${order} ${desc ? 'DESC' : ''}`;
+  }
+  if (offset) {
+    query += ` OFFSET ${offset}`;
+  }
+  if (limit) {
+    query += ` LIMIT ${limit}`;
   }
 
   try {
