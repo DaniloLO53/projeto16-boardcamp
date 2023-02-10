@@ -2,8 +2,22 @@ import { db } from "../database/database.js";
 import dayjs from 'dayjs';
 
 async function getRentals(request, response, next) {
+  const { gameId, customerId } = request.query;
+  let query = `SELECT * FROM rentals`;
+
+  if (gameId && !customerId) {
+    query += ` WHERE "gameId" = '${gameId}'`;
+  }
+  if (customerId && !gameId) {
+    query += ` WHERE "customerId" = '${customerId}'`;
+  }
+  if (customerId && gameId) {
+    query += ` WHERE "customerId" = '${customerId}'
+    AND "gameId" = '${gameId}'`;
+  }
+
   try {
-    const results = await db.query('SELECT * FROM rentals;');
+    const results = await db.query(query);
     const resultFromGames = await db.query('SELECT * FROM games;');
     const resultFromCustomers = await db.query('SELECT * FROM customers;');
 
