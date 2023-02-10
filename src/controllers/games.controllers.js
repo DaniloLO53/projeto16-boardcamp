@@ -8,7 +8,7 @@ async function getGames(request, response, next) {
     query += ` WHERE LOWER(name) LIKE LOWER('${name}_%')`;
   }
   if (order) {
-    query += ` ORDER BY ${order} ${desc ? 'DESC' : ''}`;
+    query += ` ORDER BY "${order}" ${desc ? 'DESC' : ''}`;
   }
   if (offset) {
     query += ` OFFSET ${offset}`;

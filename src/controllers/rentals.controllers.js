@@ -10,7 +10,7 @@ async function getRentals(request, response, next) {
     conditions.push(`"gameId" = '${gameId}'`);
   }
   if (customerId) {
-    conditions.push(`"customerId" = '${gameId}'`);
+    conditions.push(`"customerId" = '${customerId}'`);
   }
   if (status === 'open') {
     conditions.push(`"returnDate" IS NULL`);
@@ -25,7 +25,7 @@ async function getRentals(request, response, next) {
     query += ` WHERE ${conditions.join(' AND ')}`;
   }
   if (order) {
-    query += ` ORDER BY ${order} ${desc ? 'DESC' : ''}`;
+    query += ` ORDER BY "${order}" ${desc ? 'DESC' : ''}`;
   }
   if (offset) {
     query += ` OFFSET ${offset}`;

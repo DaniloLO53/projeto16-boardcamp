@@ -61,7 +61,7 @@ async function getCustomers(request, response, next) {
     query += ` WHERE cpf LIKE '${cpf}_%'`;
   }
   if (order) {
-    query += ` ORDER BY ${order} ${desc ? 'DESC' : ''}`;
+    query += ` ORDER BY "${order}" ${desc ? 'DESC' : ''}`;
   }
   if (offset) {
     query += ` OFFSET ${offset}`;
@@ -69,6 +69,8 @@ async function getCustomers(request, response, next) {
   if (limit) {
     query += ` LIMIT ${limit}`;
   }
+
+  console.log(query)
 
   try {
     const customers = await db.query(query);
