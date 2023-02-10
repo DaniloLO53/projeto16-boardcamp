@@ -54,8 +54,15 @@ async function getCustomer(request, response, next) {
 };
 
 async function getCustomers(request, response, next) {
+  const { cpf } = request.query;
+  let query = `SELECT * FROM customers`;
+
+  if (cpf) {
+    query += ` WHERE cpf LIKE '${cpf}_%'`;
+  }
+
   try {
-    const customers = await db.query('SELECT * FROM customers;');
+    const customers = await db.query(query);
     const results = customers.rows;
     console.log(customers);
 
