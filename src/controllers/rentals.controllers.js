@@ -18,6 +18,9 @@ async function getRentals(request, response, next) {
   if (status === 'closed') {
     conditions.push(`"returnDate" IS NOT NULL`);
   }
+  if (startDate) {
+    conditions.push(`"rentDate" >= '${startDate}'`);
+  }
   if (conditions.length > 0) {
     query += ` WHERE ${conditions.join(' AND ')}`;
   }
