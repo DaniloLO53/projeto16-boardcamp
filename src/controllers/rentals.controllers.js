@@ -2,18 +2,24 @@ import { db } from "../database/database.js";
 import dayjs from 'dayjs';
 
 async function getRentals(request, response, next) {
-  const { gameId, customerId, offset, limit, order, desc } = request.query;
+  const { gameId, customerId, offset, limit, order, desc, status, startDate } = request.query;
   let query = `SELECT * FROM rentals`;
+  const conditions = [];
 
-  if (gameId && !customerId) {
-    query += ` WHERE "gameId" = '${gameId}'`;
+  if (gameId) {
+    conditions.push(`"gameId" = '${gameId}'`);
   }
-  if (customerId && !gameId) {
-    query += ` WHERE "customerId" = '${customerId}'`;
+  if (customerId) {
+    conditions.push(`"customerId" = '${gameId}'`);
   }
-  if (customerId && gameId) {
-    query += ` WHERE "customerId" = '${customerId}'
-    AND "gameId" = '${gameId}'`;
+  if (status === 'open') {
+    conditions.push(`"returnDate" IS NULL`);
+  }
+  if (status === 'closed') {
+    conditions.push(`"returnDate" IS NOT NULL`);
+  }
+  if (conditions.length > 0) {
+    query += ` WHERE ${conditions.join(' AND ')}`;
   }
   if (order) {
     query += ` ORDER BY ${order} ${desc ? 'DESC' : ''}`;
