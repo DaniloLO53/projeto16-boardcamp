@@ -1,10 +1,16 @@
 import { db } from "../database/database.js";
 
 async function getGames(request, response, next) {
+  const { name } = request.query;
+  let query = `SELECT * FROM games`;
+
+  if (name) {
+    query += ` WHERE LOWER(name) LIKE LOWER('${name}_%')`;
+  }
+
   try {
-    const games = await db.query('SELECT * FROM games;');
+    const games = await db.query(query);
     const results = games.rows;
-    console.log(games);
 
     return response.status(200).send(results);
   } catch (error) {
